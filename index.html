@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mengarahkan ke Halaman Tujuan...</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 100px; background: #f4f6f8; color: #333; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #1a73e8; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="loader"></div>
+    <h3>Sedang menghubungkan...</h3>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const cardId = urlParams.get('id');
+
+        if (!cardId) {
+            document.body.innerHTML = "<h3>Error: ID Kartu tidak ditemukan di URL.</h3>";
+        } else {
+            // Jangan lupa pastikan URL Web App /exec kamu sudah benar di bawah ini:
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbwwX_lTuBp2V0cDlWtkSQRpEQHqMgy5udWbdKdnJWv27ItB0vFOKJxD_Ye745FAJYmPPg/exec?id=" + cardId;
+
+            fetch(scriptUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status.toLowerCase() === "activated" && data.url) {
+                        window.location.replace(data.url);
+                    } else if (data.status.toLowerCase() === "disconnect") {
+                        document.body.innerHTML = "<h3>Maaf, kartu ini telah dinonaktifkan.</h3>";
+                    } else {
+                        document.body.innerHTML = "<h3>Kartu NFC ini belum diaktivasi untuk toko mana pun.</h3>";
+                    }
+                })
+                .catch(() => {
+                    document.body.innerHTML = "<h3>Gagal memuat data. Silakan scan ulang.</h3>";
+                });
+        }
+    </script>
+</body>
+</html>
